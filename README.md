@@ -22,6 +22,8 @@ string query = “INSERT INTO User(UserName) VALUES( ‘Santiago’)”;<br/>
 sqlDB.ExecuteNonQuery(query);<br/>
 </code>
 <br/>
+<b>IMPORTANT:</b> the file “config.db” is necessary exist in the <b>“StreamingAssets”</b> folder
+<br/>
 
 <b>to execute a query this libs have 2 simple methods:<br/></b>
 <code> void ExecuteNonQuery(string query) </code> for SQL query like UPDATE, DELETE....<br/>
