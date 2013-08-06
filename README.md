@@ -1,7 +1,7 @@
 #SQLiteUnityKit
 ==============
 
-Framework to connect to SQLite database from Unity for iOS, MAC and Windows
+Framework to connect to SQLite database from Unity for iOS, Android, MAC and Windows
 
 <b>***** please don't use this code for sell an asset *****</b>
 
