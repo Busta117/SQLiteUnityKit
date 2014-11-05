@@ -94,12 +94,11 @@ public class SqliteDatabase
 	{
 		
 		pathDB = System.IO.Path.Combine (Application.persistentDataPath, dbName);
+		//original path
+		string sourcePath = System.IO.Path.Combine (Application.streamingAssetsPath, dbName);
 		
-		
-		//if no exist the DB in the folder of persistent data (folder "Documents" on iOS) proceeds to copy it.
-		if (!System.IO.File.Exists (pathDB)) {
-			//original path
-			string sourcePath = System.IO.Path.Combine (Application.streamingAssetsPath, dbName);
+		//if DB does not exist in persistent data folder (folder "Documents" on iOS) or source DB is newer then copy it
+		if (!System.IO.File.Exists (pathDB) || (System.IO.File.GetLastWriteTimeUtc(sourcePath) > System.IO.File.GetLastWriteTimeUtc(pathDB))) {
 			
 			if (sourcePath.Contains ("://")) {
 				// Android	
