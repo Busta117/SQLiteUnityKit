@@ -46,6 +46,7 @@ follow this simple steps and you can get full compatibility with android.
  * BLOB support by Jonathan Derrough @ http://jderrough.blogspot.com/
  * modify by Santiago Bustamante @ busta117@gmail.com
  * Android compatibility by Thomas Olsen @ olsen.thomas@gmail.com
+ * iOS 64 bit compatibility by Scalia @ http://scalia.es
 
 <br/>
 
