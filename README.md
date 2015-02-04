@@ -33,6 +33,8 @@ If this folder does not exist create it in the root folder of your Unity project
 	void ExecuteNonQuery(string query)  //for SQL query like UPDATE, DELETE....
 	Dictionary ExecuteQuery(string query)  //for SQL query like SELECT ....
 	
+###parameter escaping:
+Just pass a List<> as the second parameter of this methods and include them in your query, with "?" or "@param" as in regular SQLite.
 
 ##for Android compatibility:
 </br>
@@ -46,7 +48,7 @@ follow this simple steps and you can get full compatibility with android.
  * BLOB support by Jonathan Derrough @ http://jderrough.blogspot.com/
  * modify by Santiago Bustamante @ busta117@gmail.com
  * Android compatibility by Thomas Olsen @ olsen.thomas@gmail.com
- * iOS 64 bit compatibility by Scalia @ http://scalia.es
+ * Parameter escaping and iOS 64 bit compatibility by Scalia @ http://scalia.es
 
 <br/>
 
