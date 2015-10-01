@@ -174,20 +174,22 @@ public class SqliteDatabase
 			Debug.Log ("ERROR: Can't execute the query, verify DB origin file");
 			return;
 		}
+		try {
+			this.Open ();
+			if (!IsConnectionOpen) {
+				throw new SqliteException ("SQLite database is not open.");
+			}
 			
-		this.Open ();
-		if (!IsConnectionOpen) {
-			throw new SqliteException ("SQLite database is not open.");
+			IntPtr stmHandle = Prepare (query);
+			
+			if (sqlite3_step (stmHandle) != SQLITE_DONE) {
+				throw new SqliteException ("Could not execute SQL statement.");
+			}
+			
+			Finalize (stmHandle);
+		} finally {
+			this.Close ();
 		}
-
-		IntPtr stmHandle = Prepare (query);
- 
-		if (sqlite3_step (stmHandle) != SQLITE_DONE) {
-			throw new SqliteException ("Could not execute SQL statement.");
-		}
-        
-		Finalize (stmHandle);
-		this.Close ();
 	}
 	
 	/// <summary>
@@ -209,95 +211,99 @@ public class SqliteDatabase
 			return null;
 		}
 		
-		this.Open ();
-		if (!IsConnectionOpen) {
-			throw new SqliteException ("SQLite database is not open.");
-		}
-        
-		IntPtr stmHandle = Prepare (query);
- 
-		int columnCount = sqlite3_column_count (stmHandle);
- 
 		var dataTable = new DataTable ();
-		for (int i = 0; i < columnCount; i++) {
-			string columnName = Marshal.PtrToStringAnsi (sqlite3_column_name (stmHandle, i));
-			dataTable.Columns.Add (columnName);
-		}
-        
 		
-		//populate datatable
-		while (sqlite3_step(stmHandle) == SQLITE_ROW) {
-			object[] row = new object[columnCount];
-			for (int i = 0; i < columnCount; i++) {
-				switch (sqlite3_column_type (stmHandle, i)) {
-				case SQLITE_INTEGER:
-					row [i] = sqlite3_column_int (stmHandle, i);
-					break;
-                
-				case SQLITE_TEXT:
-					IntPtr text = sqlite3_column_text (stmHandle, i);
-					row [i] = Marshal.PtrToStringAnsi (text);
-					break;
-
-				case SQLITE_FLOAT:
-					row [i] = sqlite3_column_double (stmHandle, i);
-					break;
-                    
-				case SQLITE_BLOB:
-					IntPtr blob = sqlite3_column_blob (stmHandle, i);
-					int size = sqlite3_column_bytes (stmHandle, i);
-					byte[] data = new byte[size];
-					Marshal.Copy (blob, data, 0, size);
-					row [i] = data;
-					break;
-					
-				case SQLITE_NULL:
-					row [i] = null;
-					break;
-				}
+		try {
+			this.Open ();
+			if (!IsConnectionOpen) {
+				throw new SqliteException ("SQLite database is not open.");
 			}
-        
-			dataTable.AddRow (row);
+			
+			IntPtr stmHandle = Prepare (query);
+			
+			int columnCount = sqlite3_column_count (stmHandle);
+			
+			
+			for (int i = 0; i < columnCount; i++) {
+				string columnName = Marshal.PtrToStringAnsi (sqlite3_column_name (stmHandle, i));
+				dataTable.Columns.Add (columnName);
+			}
+			
+			//populate datatable
+			while (sqlite3_step(stmHandle) == SQLITE_ROW) {
+				object[] row = new object[columnCount];
+				for (int i = 0; i < columnCount; i++) {
+					switch (sqlite3_column_type (stmHandle, i)) {
+					case SQLITE_INTEGER:
+						row [i] = sqlite3_column_int (stmHandle, i);
+						break;
+						
+					case SQLITE_TEXT:
+						IntPtr text = sqlite3_column_text (stmHandle, i);
+						row [i] = Marshal.PtrToStringAnsi (text);
+						break;
+						
+					case SQLITE_FLOAT:
+						row [i] = sqlite3_column_double (stmHandle, i);
+						break;
+						
+					case SQLITE_BLOB:
+						IntPtr blob = sqlite3_column_blob (stmHandle, i);
+						int size = sqlite3_column_bytes (stmHandle, i);
+						byte[] data = new byte[size];
+						Marshal.Copy (blob, data, 0, size);
+						row [i] = data;
+						break;
+						
+					case SQLITE_NULL:
+						row [i] = null;
+						break;
+					}
+				}
+				
+				dataTable.AddRow (row);
+			}
+			
+			Finalize (stmHandle);
+		} finally {
+			this.Close ();
 		}
-        
-		Finalize (stmHandle);
-		this.Close ();
 		return dataTable;
 	}
-    
+	
 	public void ExecuteScript (string script)
 	{
 		string[] statements = script.Split (';');
-        
+		
 		foreach (string statement in statements) {
 			if (!string.IsNullOrEmpty (statement.Trim ())) {
 				ExecuteNonQuery (statement);
 			}
 		}
 	}
-    
-    #endregion
-    
-    #region Private Methods
- 
+	
+	#endregion
+	
+	#region Private Methods
+	
 	private IntPtr Prepare (string query)
 	{
 		IntPtr stmHandle;
-        
+		
 		if (sqlite3_prepare_v2 (_connection, query, query.Length, out stmHandle, IntPtr.Zero) != SQLITE_OK) {
 			IntPtr errorMsg = sqlite3_errmsg (_connection);
 			throw new SqliteException (Marshal.PtrToStringAnsi (errorMsg));
 		}
-        
+		
 		return stmHandle;
 	}
- 
+	
 	private void Finalize (IntPtr stmHandle)
 	{
 		if (sqlite3_finalize (stmHandle) != SQLITE_OK) {
 			throw new SqliteException ("Could not finalize SQL statement.");
 		}
 	}
-    
-    #endregion
+	
+	#endregion
 }
