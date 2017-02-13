@@ -78,8 +78,12 @@ public class SqliteDatabase
 	private IntPtr _connection;
 
 	private bool IsConnectionOpen { get; set; }
-	
+
 	private string pathDB;
+	// Use it in Close()	
+	private string sourcePath;
+	// Use it in Close()	
+	private string _dbName;
 	
 	
     #region Public Methods
@@ -92,10 +96,11 @@ public class SqliteDatabase
 	/// </param>
 	public SqliteDatabase (string dbName)
 	{
+		_dbName = dbName;
 		
 		pathDB = System.IO.Path.Combine (Application.persistentDataPath, dbName);
 		//original path
-		string sourcePath = System.IO.Path.Combine (Application.streamingAssetsPath, dbName);
+		sourcePath = System.IO.Path.Combine (Application.streamingAssetsPath, dbName);
 		
 		//if DB does not exist in persistent data folder (folder "Documents" on iOS) or source DB is newer then copy it
 		if (!System.IO.File.Exists (pathDB) || (System.IO.File.GetLastWriteTimeUtc(sourcePath) > System.IO.File.GetLastWriteTimeUtc(pathDB))) {
@@ -152,11 +157,18 @@ public class SqliteDatabase
      
 	private void Close ()
 	{
+		pathDB = System.IO.Path.Combine (Application.persistentDataPath, _dbName);
+		//original path
+		sourcePath = System.IO.Path.Combine (Application.streamingAssetsPath, _dbName);
+
 		if (IsConnectionOpen) {
 			sqlite3_close (_connection);
 		}
         
 		IsConnectionOpen = false;
+		//copy to origin db
+		System.IO.File.Copy (pathDB, sourcePath, true);
+
 	}
  
 	/// <summary>
