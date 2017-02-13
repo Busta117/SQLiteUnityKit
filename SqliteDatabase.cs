@@ -13,7 +13,6 @@ using UnityEngine;
  *
  * */
  
-
 public class SqliteException : Exception
 {
 	public SqliteException (string message) : base(message)
@@ -284,7 +283,6 @@ public class SqliteDatabase
 	private IntPtr Prepare (string query)
 	{
 		IntPtr stmHandle;
-		if ()
 		int byteCount = System.Text.Encoding.GetEncoding("UTF-8").GetByteCount(query);
 		if (sqlite3_prepare_v2 (_connection, query, byteCount, out stmHandle, IntPtr.Zero) != SQLITE_OK) {
 			IntPtr errorMsg = sqlite3_errmsg (_connection);
