@@ -15,13 +15,13 @@ Framework to connect to SQLite database from Unity for iOS, Android, MAC and Win
 
 ###How to Use:
 
-	SqliteDatabase sqlDB = new SqliteDatabase(“config.db”);
-	string query = “INSERT INTO User(UserName) VALUES( ‘Santiago’)”;
+	SqliteDatabase sqlDB = new SqliteDatabase("config.db");
+	string query = “INSERT INTO User(UserName) VALUES( 'Santiago')";
 	sqlDB.ExecuteNonQuery(query);
 
 
 ####IMPORTANT: 
-the file *“config.db”* is necessary exist in the **“StreamingAssets”** folder.
+the file *"config.db"* is necessary exist in the **"StreamingAssets"** folder.
 
 If this folder does not exist create it in the root folder of your Unity project.
   
